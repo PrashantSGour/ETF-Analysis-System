@@ -1,0 +1,310 @@
+{% extends "base1.html" %}
+{% block title %}User details{% endblock title %}
+{% load static %}
+{% block body %}
+ 
+<style>
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 30px; /* Adjusted width */
+    height: 18px; /* Adjusted height */
+  }
+
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 9px; /* Adjusted border-radius */
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px; /* Adjusted height */
+    width: 14px; /* Adjusted width */
+    left: 2px; /* Adjusted position */
+    bottom: 2px; /* Adjusted position */
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%; /* Rounded shape */
+  }
+
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  input:checked + .slider:before {
+    -webkit-transform: translateX(14px); /* Adjusted translation */
+    -ms-transform: translateX(14px);
+    transform: translateX(14px);
+  }
+
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 9px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  
+</style>
+
+
+<main id="main" class="main">
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <strong>{{message}}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+  {% endif %}
+  <div class="pagetitle">
+      <h1>User details</h1>
+      <nav>
+          <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url "admindashboard" %}">Home</a></li>
+              <li class="breadcrumb-item active">User Data</li>
+          </ol>
+      </nav>
+  </div>
+  <div class="d-inline ">
+      <div class="dropdown mb-2 d-inline">
+          <button class="btn btn-info dropdown-toggle" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Select user details
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="statusDropdown">
+              <li><a class="dropdown-item" href="{% url 'users_data' %}">All Users</a></li>
+              <li><a class="dropdown-item" href="{% url 'active_user' %}">Active Users</a></li>
+              <li><a class="dropdown-item" href="{% url 'deactivate_user' %}">Deactivated Users</a></li>
+          </ul>
+      </div>
+
+
+  </div>
+  <button type="button" class="btn btn-danger" id="delete-selected" style="display: none;">&#128465;</button>
+
+
+  <section class="section mt-2">
+      <div class="row">
+          <div class="col-lg-12">
+              <div class="card">
+                  <div class="card-body">
+                      <h5 class="card-title">Pending request user data</h5>
+                      <table class="table   table-hover">
+                          <thead>
+                              <tr>
+                                  <th><input type="checkbox" class="all-checkbox" id="select-all"></th>
+                                  <th>Name</th>
+                                  <th>Username</th>
+                                  <th>Email</th>
+                                  <th>DOB</th>
+                                  <th>Phone</th>
+                                  <th>Is Verified</th>
+                                  <th>Status</th>
+                                  <th>Subscription</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for user in users %}
+                              <tr>
+                                <td><input type="checkbox" class="data-checkbox" data-username="{{ user.username }}" onclick="toggleDeleteButtonVisibility()"></td>
+                                <td>{{ user.name }}</td>
+                                  <td>{{ user.username }}</td>
+                                  <td>{{ user.email }}</td>
+                                  <td>{{user.date_of_birth}}</td>
+                                  <td>{{user.phone_number}}</td>
+                                  <td class="text-center">
+                                      {% if user.is_verified %}
+                                          {{user.is_verified}}
+                                      {% else %}
+                                          Pending
+                                      {% endif %}
+                                  </td>
+                                  
+                                  <td class="text-center">
+                                    <label class="switch">
+                                        <input type="checkbox" {% if user.login_status %}checked{% endif %} onclick="window.location.href='{% if user.login_status %}{% url 'decline' user.username %}{% else %}{% url 'approve' user.username %}{% endif %}'">
+                                        <span class="slider round {% if user.login_status %}green{% else %}red{% endif %}"></span>
+                                    </label>
+                                  </td>
+                                {% for wallet in wallet %}
+                                    {% if user.username == wallet.user.username %}
+                                        <td>{{ wallet.sub_status }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                                  </td> 
+                                  {% comment %} <td class="text-center">
+                                    <label class="switch">
+                                        <input type="checkbox" {% if user.login_status %}checked{% endif %} onclick="window.location.href='{% if user.login_status %}{% url 'decline' user.username %}{% else %}{% url 'approve' user.username %}{% endif %}'">
+                                        <span class="slider round {% if user.login_status %}green{% else %}red{% endif %}"></span>
+                                    </label>
+                                  </td>
+                                  <td>{{ user.sub_status }}</td> {% endcomment %}
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+</main>
+ 
+
+<script>
+  // Function to toggle delete button visibility based on checkbox state
+//   function toggleDeleteButtonVisibility() {
+//     var deleteButton = document.getElementById('delete-selected');
+//     var checkboxes = document.querySelectorAll('.data-checkbox:checked');
+//     deleteButton.style.display = checkboxes.length > 0 ? 'inline' : 'none';
+//   }
+
+//   // Initial toggle delete button visibility
+//   toggleDeleteButtonVisibility();
+
+  // Function to toggle select all checkbox
+  document.getElementById('select-all').addEventListener('change', function () {
+    var checkboxes = document.querySelectorAll('.data-checkbox');
+    checkboxes.forEach(function (checkbox) {
+        checkbox.checked = this.checked;
+    }.bind(this));
+    toggleDeleteButtonVisibility();
+  });
+
+  // Function to handle deletion of selected users
+  document.getElementById('delete-selected').addEventListener('click', function () {
+    var selectedUsers = [];
+    var checkboxes = document.querySelectorAll('.data-checkbox:checked');
+    checkboxes.forEach(function (checkbox) {
+        selectedUsers.push(checkbox.getAttribute('data-username'));
+    });
+
+    // Redirect to delete view with selected users' usernames
+    if (selectedUsers.length > 0) {
+        var url = '{% url "delete_selected_users" %}?usernames=' + selectedUsers.join(',');
+        window.location.href = url;
+    } else {
+        alert('Please select at least one user to delete.');
+    }
+  });
+
+
+  // Function to handle deletion of selected users
+  document.getElementById('delete-selected').addEventListener('click', function () {
+      var selectedUsers = [];
+      var checkboxes = document.querySelectorAll('.data-checkbox:checked');
+      checkboxes.forEach(function (checkbox) {
+          selectedUsers.push(checkbox.getAttribute('data-username'));
+      });
+
+      // Redirect to delete view with selected users' usernames
+      if (selectedUsers.length > 0) {
+          var url = '{% url "delete_selected_users" %}?usernames=' + selectedUsers.join(',');
+          window.location.href = url;
+      } else {
+          alert('Please select at least one user to delete.');
+      }
+  });
+
+//   // Function to toggle delete button visibility based on checkbox state
+//   function toggleDeleteButtonVisibility() {
+//     var deleteButton = document.getElementById('delete-selected');
+//     var checkboxes=[];
+//     checkboxes.push(document.querySelectorAll('data-checkbox:checked'));
+//     // var checkboxes = document.querySelectorAll('.data-checkbox:checked');
+//     if (checkboxes.length >0) {
+//         deleteButton.style.display = '';
+//     } else {
+//         deleteButton.style.display = 'none';
+//     }
+//   }
+//   function toggleDeleteButtonVisibility() {
+//     var deleteButton = document.getElementById('delete-selected');
+//     var checkboxes = document.querySelectorAll('.data-checkbox:checked');
+    
+//     if (checkboxes.length > 0) {
+//         deleteButton.style.display = '';
+//     } else {
+//         deleteButton.style.display = 'none';
+//     }
+// }
+document.addEventListener('DOMContentLoaded', function() {
+    var checkboxes = document.querySelectorAll('.data-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('click', toggleDeleteButtonVisibility);
+    });
+});
+
+function toggleDeleteButtonVisibility() {
+    var deleteButton = document.getElementById('delete-selected');
+    var checkboxes = document.querySelectorAll('.data-checkbox:checked');
+    
+    if (checkboxes.length > 0) {
+        deleteButton.style.display = '';
+    } else {
+        deleteButton.style.display = 'none';
+    }
+}
+
+
+  // Initial toggle delete button visibility
+  toggleDeleteButtonVisibility();
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      function filterRows() {
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("search");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("allTable");
+          tr = table.getElementsByTagName("tr");
+      
+          // Loop through all table rows
+          for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[2]; // Change index to match the column of ETF names
+              if (td) {
+                  txtValue = td.textContent || td.innerText;
+                  if (filter === "" || txtValue.toUpperCase().indexOf(filter) > -1) {
+                      tr[i].style.display = ""; // Show row if it matches search or if search is empty
+                  } else {
+                      tr[i].style.display = "none"; // Hide row if it doesn't match search
+                      // Hide details row when search is cleared
+                      const detailsRow = tr[i].nextElementSibling;
+                      if (detailsRow && detailsRow.classList.contains('details-row')) {
+                          detailsRow.style.display = "none";
+                      }
+                  }
+              }
+          }
+      }
+      
+
+  
+      // Attach filter function to input field
+      document.getElementById("search").addEventListener("keyup", filterRows);
+  });
+</script>
+ 
+ 
+{% endblock body %}

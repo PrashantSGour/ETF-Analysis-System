@@ -1,0 +1,407 @@
+{% extends "userbase.html" %}
+{% block title %}User Dashboard {% endblock title %}
+{% load static %}
+{% block body %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    /* CUSTOM UTIL CLASSES */
+    
+
+    .EL-modal-body {
+        background: #00B4DB; /* Set modal body background color to the same as body-pricing */
+        background: -webkit-linear-gradient(to right, #0083B0, #00B4DB);
+        background: linear-gradient(to right, #0083B0, #00B4DB);
+        color: #514B64;
+        min-height: 100vh;
+        padding-bottom: 100px;
+    }
+
+    .rounded-lg {
+        border-radius: 1rem !important;
+    }
+
+    .text-small {
+        font-size: 0.9rem !important;
+    }
+
+    .custom-separator {
+        width: 5rem;
+        height: 6px;
+        border-radius: 1rem;
+    }
+
+    .text-uppercase {
+        letter-spacing: 0.2em;
+    }
+
+    /* FOR DEMO PURPOSES */
+    body-pricing {
+        background: #00B4DB;
+        background: -webkit-linear-gradient(to right, #0083B0, #00B4DB);
+        background: linear-gradient(to right, #0083B0, #00B4DB);
+        color: #514B64;
+        min-height: 100vh;
+    }
+
+    .pricing-card {
+        transition: all 0.3s ease;
+    }
+
+    /* Add this style to increase hover effect */
+    .pricing-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .dropdown-button {
+        background: transparent;
+        border: none;
+        color: inherit;
+    }
+</style>
+
+<main id="main" class="main">
+  {% if messages %}
+    {% for message in messages  %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong> {{message}} </strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+
+  <div class="pagetitle">
+    <h1>Dashboard</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url "UserDashboard" %}">Home</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+      <h1> Welcome -  {{data.username}}</h1>
+      <h1> Your Subscription - 
+      {% if data.sub_status == 'Silver' %}
+        Silver</h1>
+      {% elif data.sub_status == 'Gold' %}
+        Gold</h1>
+      {% elif data.sub_status == 'Platinum' %}
+        Platinum</h1>
+      {% else %}
+      Unsubscribed</h1>
+      {% endif %}
+    </div>
+    <div class='container justify-content-end'>
+      <button id="Subscription-cards" type="button" class="btn btn-sm btn-success mt-3" data-bs-toggle="modal" data-bs-target="#ExtralargeModal">
+        Subscription Cards
+      </button>
+    </div>
+    <div class='container justify-content-end'>
+      <button id="buy-Subscription" type="button" class="btn btn-sm btn-success mt-3" data-bs-toggle="modal" data-bs-target="#Modal">
+        Buy Subscriptions
+      </button>
+    </div>
+
+    
+  </section>
+
+</main>
+
+<div class="modal fade" id="ExtralargeModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" id="modalDialog">
+      <div class="modal-content">
+        <div class="modal-header text-center">
+            <h5 class="modal-title w-100">Buy Subscriptions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="EL-modal-body overflow-auto">
+          <!-- add code here-->
+          <div class = "body-pricing">
+            <section>
+                <div class="container py-5" style="max-height: 80vh; overflow-y: auto;">
+
+                    <!-- FOR DEMO PURPOSE -->
+                    <header class="text-center mb-5 text-white">
+                        <div class="row">
+                            <div class="col-lg-7 mx-auto">
+                                <h1>Subscription Table</h1>
+                                <p>Select any subscription from below<br></p>
+                            </div>
+                        </div>
+                    </header>
+                    <!-- END -->
+
+
+                    <div class="row text-center align-items-end">
+                        <!-- Pricing Table-->
+                        <div class="col-lg-4 mb-5 mb-lg-0">
+                            <div class="bg-white p-5 rounded-lg shadow pricing-card">
+                                <h1 class="h6 text-uppercase font-weight-bold mb-4">Silver</h1>
+                                <h2 class="h1 font-weight-bold">₹<span id="silver-price">100</span>/<div class="dropdown my-4">
+                                    <button class="btn btn-secondary dropdown-toggle dropdown-button" type="button" id="silver-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        1 month
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="silver-dropdown">
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('silver', 100, '1 month')">1 Month</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('silver', 200, '3 months')">3 Months</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('silver', 300, '6 months')">6 Months</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('silver', 500, '1 year')">1 Year</a>
+                                    </div>
+                                </div></h2>
+                                <div class="custom-separator my-4 mx-auto bg-primary"></div>
+                                <ul class="list-unstyled my-5 text-small text-left">
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> ETF data</li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>DMA comparisons</del>
+                                    </li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Buy/Sell ETFs</del>
+                                    </li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Feature 4</del>
+                                    </li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Feature 5</del>
+                                    </li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Feature 6</del>
+                                    </li>
+                                </ul>
+                                <!-- Inside each pricing card -->
+                                <a class="btn btn-primary btn-block p-2 shadow rounded-pill" onclick="fetchSubscriptionDetails('Silver', getSelectedTimePeriod('silver'))" data-bs-dismiss="modal">Subscribe</a>
+
+                            </div>
+                        </div>
+                        <!-- END -->
+
+
+                        <!-- Pricing Table-->
+                        <div class="col-lg-4 mb-5 mb-lg-0">
+                            <div class="bg-white p-5 rounded-lg shadow pricing-card">
+                                <h1 class="h6 text-uppercase font-weight-bold mb-4">Gold</h1>
+                                <h2 class="h1 font-weight-bold">₹<span id="gold-price">200</span>/<div class="dropdown my-4">
+                                    <button class="btn btn-secondary dropdown-toggle dropdown-button" type="button" id="gold-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        1 month
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="gold-dropdown">
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('gold', 200, '1 month')">1 Month</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('gold', 300, '3 months')">3 Months</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('gold', 500, '6 months')">6 Months</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('gold', 800, '1 year')">1 Year</a>
+                                    </div>
+                                </div></h2>
+                                <div class="custom-separator my-4 mx-auto bg-primary"></div>
+                                <ul class="list-unstyled my-5 text-small text-left font-weight-normal">
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> ETF data</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> DMA comparisons</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> Buy/Sell ETFs</li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Feature 4</del>
+                                    </li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Feature 5</del>
+                                    </li>
+                                    <li class="mb-3 text-muted">
+                                        <i class="fa fa-times mr-2"></i>
+                                        <del>Feature 6</del>
+                                    </li>
+                                </ul>
+                                <a class="btn btn-primary btn-block p-2 shadow rounded-pill" onclick="fetchSubscriptionDetails('Gold', getSelectedTimePeriod('gold'))" data-bs-dismiss="modal">Subscribe</a>
+                            </div>
+                        </div>
+                        <!-- END -->
+
+
+                        <!-- Pricing Table-->
+                        <div class="col-lg-4">
+                            <div class="bg-white p-5 rounded-lg shadow pricing-card">
+                                <h1 class="h6 text-uppercase font-weight-bold mb-4">Diamond</h1>
+                                <h2 class="h1 font-weight-bold">₹<span id="Diamond-price">300</span>/<div class="dropdown my-4">
+                                    <button class="btn btn-secondary dropdown-toggle dropdown-button" type="button" id="Diamond-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        1 month
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="Diamond-dropdown">
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('Diamond', 300, '1 month')">1 Month</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('Diamond', 500, '3 months')">3 Months</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('Diamond', 800, '6 months')">6 Months</a>
+                                        <a class="dropdown-item" href="#" onclick="updatePrice('Diamond', 1200, '1 year')">1 Year</a>
+                                    </div>
+                                </div></h2>
+                                <div class="custom-separator my-4 mx-auto bg-primary"></div>
+                                <ul class="list-unstyled my-5 text-small text-left font-weight-normal">
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> ETF data</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> DMA comparisons</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> Buy/Sell ETFs</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> Feature 4</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> Feature 5</li>
+                                    <li class="mb-3">
+                                        <i class="fa fa-check mr-2 text-primary"></i> Feature 6</li>
+                                </ul>
+                                <a class="btn btn-primary btn-block p-2 shadow rounded-pill" onclick="fetchSubscriptionDetails('Diamond', getSelectedTimePeriod('Diamond'))" data-bs-dismiss="modal">Subscribe</a>
+                            </div>
+                        </div>
+                        <!-- END -->
+
+                    </div>
+                </div>
+            </section>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Modal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" id="modalDialog">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+          <h5 class="modal-title w-100">Buy Subscriptions</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body overflow-auto">
+        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <form action="{% url 'UserDashboard' %}" method="post" >
+                  {% csrf_token %}
+                  {% if messages %}
+                    <div id="message-container" class="alert alert-info text-black bi-text-left mt-5" >
+                      <ul>
+                        {% for message in messages %}
+                          <li>{{ message }}</li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+                  <div class="card mb-3 mt-5" id='buyCard' style="border: 4px solid green;" >
+                    <div class="card-body">
+                      <div class="pt-3 pb-1">
+                        <h5 class="card-title text-center pb-0 fs-4">Buy Subscription</h5>
+                        <p class="text-center small">Enter required details to buy Subscription</p>
+                      </div>
+                      <hr/>
+                      <form class="row g-3 needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row" >
+                            <div class="col-6">
+                                <p class="text-end"><strong>Username</strong></p>
+                            </div>
+                            <div class="col-6">
+                                <p style="margin-top: 0">: {{ request.user.username }}</p>
+                            </div>
+                        </div>
+                        <!-- <br> -->
+                        <div class ="row">
+                          <div class="col-12">
+                            <label for="Subscription" class="form-label">Subscription:</label>
+                            <select id="subs" name="subs" class="form-control">
+                              <option value="">Select</option>
+                              <option value="Silver">Silver</option>
+                              <option value="Gold">Gold</option>
+                              <option value="Platinum">Platinum</option>
+                              <option value="Unsubscribed">Unsubscribed</option>
+                            </select>
+                          </div>
+                        <br>
+                        <div class="col-12 mt-3">
+                          <button class="btn btn-success w-100" type="submit">Buy</button>
+                        </div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </form>       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function updatePrice(card, price, label) {
+        document.getElementById(card + '-price').textContent = price;
+        document.getElementById(card + '-dropdown').textContent = label;
+    }
+
+    // Function to retrieve the selected time period from the dropdown menu
+    function getSelectedTimePeriod(card) {
+      // Get the selected option from the dropdown menu
+      const dropdown = document.getElementById(card + '-dropdown');
+      const selectedOption = dropdown.textContent.trim(); // Trim to remove any leading/trailing whitespace
+      console.log(selectedOption);
+      return selectedOption;
+    }
+
+    // Function to fetch subscription details based on selected subscription type and time period
+    function fetchSubscriptionDetails(subscriptionType, timePeriod) {
+      let fetchUrl = '/registereduser/subs/'; // Replace with your Django URL for fetching subscription details
+      const csrftoken = getCookie('csrftoken');
+      const requestBody = {
+          subscriptionType: subscriptionType,
+          timePeriod: timePeriod
+      };
+
+      fetch(fetchUrl, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
+          },
+          body: JSON.stringify(requestBody)
+      })
+    }
+
+    // Function to get CSRF token from cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+    }
+
+</script>
+  {% endblock body %}
